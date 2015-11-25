@@ -8,6 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,7 +33,8 @@ public class AdapterDoListy extends RecyclerView.Adapter<AdapterDoListy.VH> {
     public void update() {
         refreshAll();
     }
-    private void refreshWith(List<Model> data){
+
+    private void refreshWith(List<Model> data) {
         dataSet.addAll(data);
         notifyItemRangeChanged(0, getItemCount());
         notifyDataSetChanged();
@@ -40,6 +42,7 @@ public class AdapterDoListy extends RecyclerView.Adapter<AdapterDoListy.VH> {
 
     /**
      * tworzenie widoku
+     *
      * @param viewGroup
      * @param i
      * @return
@@ -51,16 +54,22 @@ public class AdapterDoListy extends RecyclerView.Adapter<AdapterDoListy.VH> {
     }
 
 
+    private Bitmap scaledBMP(String path) {
+        return Bitmap.createScaledBitmap(BitmapFactory.decodeFile(path), 100, 100, false);
+    }
+
     /**
      * odświeżenie pojedynczego elementu listy
+     *
      * @param vh
      * @param position
      */
     @Override
     public void onBindViewHolder(VH vh, int position) {
         final Model model = dataSet.get(position);
-        final Bitmap pencilImage = BitmapFactory.decodeFile(model.getImageFilePath());
-        final Bitmap kasztan = BitmapFactory.decodeFile(model.getBorrowerFilePath());
+        final Bitmap pencilImage = scaledBMP(model.getImageFilePath());
+        final Bitmap kasztan = scaledBMP(model.getBorrowerFilePath());
+
         vh.borrower.setImageBitmap(kasztan);
         vh.pencil.setImageBitmap(pencilImage);
         /**
@@ -72,10 +81,11 @@ public class AdapterDoListy extends RecyclerView.Adapter<AdapterDoListy.VH> {
                 Realm realm = Realm.getInstance(context);
                 realm.beginTransaction();
                 RealmResults<Model> toDelete = realm.where(Model.class)
-                        .equalTo("primaryKey",model.getPrimaryKey()).findAll();
+                        .equalTo("primaryKey", model.getPrimaryKey()).findAll();
                 toDelete.clear();
                 realm.commitTransaction();
                 refreshAll();
+                Toast.makeText(context, "Pair deleted", Toast.LENGTH_SHORT).show();
                 return false;
             }
         });
