@@ -1,0 +1,47 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    tools:context=".MainActivity">
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/lista"
+        android:layout_width="match_parent"
+        android:layout_height="300sp"
+        android:scrollbars="vertical" />
+
+    <TextView
+        android:id="@+id/borrower"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/lista"
+        android:padding="20sp"
+        android:background="#ff0000"
+        android:text="ADD Borrower" />
+
+    <TextView
+        android:id="@+id/item"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/lista"
+        android:layout_toRightOf="@+id/borrower"
+        android:padding="20sp"
+        android:background="#ffff00"
+        android:text="ADD Item" />
+    <TextView
+        android:id="@+id/group"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/lista"
+        android:layout_toRightOf="@+id/item"
+        android:background="#00ffff"
+        android:padding="20sp"
+        android:text="ADD group" />
+
+
+
+</RelativeLayout>
