@@ -16,30 +16,52 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
 
 import io.realm.Realm;
-import io.realm.RealmResults;
 
 public class MainActivity extends AppCompatActivity {
+
+    public static final String TAG = MainActivity.class.getSimpleName();
     public static final int SELECT_KASZTAN_PHOTO = 100;
     public static final int SELECT_PENCIL_PHOTO = 200;
-    public static final String TAG = MainActivity.class.getSimpleName();
+
+    /**stan aktualny wybranego pliku*/
+    private IMAGE_SELECTED CURRENT = IMAGE_SELECTED.NONE;
+    /**enum reprezentujący stany*/
     private enum IMAGE_SELECTED {
         NONE, KASZTAN, PENCIL
     }
 
+    /**
+     * widok listy z obrazkami
+     */
     private RecyclerView lista;
+    /**
+     * przycisk dodający nową parę
+     */
     private TextView group;
-    private IMAGE_SELECTED CURRENT = IMAGE_SELECTED.NONE;
+    /**
+     * dwie zmienne: ścieżki do wybranych obrazów
+     */
     private String temporaryPencil = null;
     private String temporaryKasztan = null;
+    /**
+     * czy można już dodać nową parę? (flaga)
+     */
     private boolean enableGroup = false;
+    /**
+     * pośrednik między danymi a widokiem listy:
+     */
     private AdapterDoListy adapterDoListy;
+    /**
+     * instancja Realma: obiekt z biblioteki realm.io, dzięki której możliwy jest dostęp do bazy danych
+     */
     private Realm realm;
 
+    /**
+     * po wyłączeniu apki zwalniamy zasoby: zamykamy nieużywane instancje
+     */
     @Override
     protected void onDestroy() {
         if (realm != null)
@@ -47,17 +69,20 @@ public class MainActivity extends AppCompatActivity {
         super.onDestroy();
     }
 
+    /**
+     * stworzenie widoku Activity
+     * @param savedInstanceState
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         realm = Realm.getInstance(this);
+        setupList();
+        setupButtons();
+    }
 
-        lista = (RecyclerView) findViewById(R.id.lista);
-        lista.setLayoutManager(new LinearLayoutManager(this));
-        adapterDoListy = new AdapterDoListy(this);
-        lista.setAdapter(adapterDoListy);
-
+    private void setupButtons() {
         group = (TextView) findViewById(R.id.group);
         findViewById(R.id.item).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -77,6 +102,19 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    private void setupList() {
+        lista = (RecyclerView) findViewById(R.id.lista);
+        lista.setLayoutManager(new LinearLayoutManager(this));
+        adapterDoListy = new AdapterDoListy(this);
+        lista.setAdapter(adapterDoListy);
+    }
+
+    /**
+     * powrót do aktywności po wybraniu obrazu
+     * @param requestCode
+     * @param resultCode
+     * @param imageReturnedIntent
+     */
     protected void onActivityResult(int requestCode, int resultCode,
                                     Intent imageReturnedIntent) {
         super.onActivityResult(requestCode, resultCode, imageReturnedIntent);
@@ -128,45 +166,49 @@ public class MainActivity extends AppCompatActivity {
             group.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    AlertDialog.Builder okno = new AlertDialog.Builder(MainActivity.this);
-                    okno.setMessage("Do you want to add this pair?");
-                    okno.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            dialog.dismiss();
-                        }
-                    });
-                    okno.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            CURRENT = IMAGE_SELECTED.NONE;
-                            saveToDB();
-                            updateList();
-                        }
-                    });
-                    okno.show();
+                    pokazOkno();
                 }
             });
         }
     }
 
+    private void pokazOkno() {
+        AlertDialog.Builder okno = new AlertDialog.Builder(MainActivity.this);
+        okno.setMessage("Do you want to add this pair?");
+        okno.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+            }
+        });
+        okno.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                CURRENT = IMAGE_SELECTED.NONE;
+                saveToDB();
+                updateList();
+                dialog.dismiss();
+            }
+        });
+        okno.show();
+    }
+
+    /**
+     * zapis nowego rekordu do bazy danych
+     */
     private void saveToDB() {
         Log.d(TAG, "saveToDB ");
-        realm.beginTransaction();
+        realm.beginTransaction(); //rozpoczęcie transakcji
         Model newRecord = realm.createObject(Model.class);
-        newRecord.setPrimaryKey(UUID.randomUUID().toString());
+        newRecord.setPrimaryKey(UUID.randomUUID().toString()); //primary key musi być unikalny
         newRecord.setBorrowerFilePath(temporaryKasztan);
         newRecord.setImageFilePath(temporaryPencil);
-        realm.commitTransaction();
+        realm.commitTransaction(); //zakończenie transakcji
     }
 
     private void updateList() {
-        List<Model> list =new ArrayList<>();
-        realm.beginTransaction();
-        RealmResults<Model> results = realm.where(Model.class).findAll();
-        list.addAll(results);
-        realm.commitTransaction();
-        adapterDoListy.updateWith(list);
+        Log.d(TAG, "updateList ");
+        adapterDoListy.update();
         Toast.makeText(this,"List updated",Toast.LENGTH_LONG).show();
     }
 }

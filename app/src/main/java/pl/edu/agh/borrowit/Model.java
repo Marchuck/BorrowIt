@@ -5,6 +5,12 @@ import io.realm.annotations.PrimaryKey;
 
 /**
  * Created by lukasz on 25.11.15.
+ * Tabela trzymająca ścieżki do obrazów
+ * Każdy rekord bazy musi mieć unikalny primaryKey, zawsze jest generowany losowo,
+ * bo stworzyć 2 identyczne UUIDy jest o wiele mniej prawdopodobne niż trafienie 6 w totka.
+ *
+ * więcej na realm.io
+ *
  */
 public class Model extends RealmObject {
     @PrimaryKey

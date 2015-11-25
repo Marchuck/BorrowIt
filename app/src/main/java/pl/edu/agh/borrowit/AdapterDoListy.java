@@ -17,6 +17,7 @@ import io.realm.RealmResults;
 
 /**
  * Created by lukasz on 25.11.15.
+ * Adapter do listy znajdującej się nad buttonami
  */
 public class AdapterDoListy extends RecyclerView.Adapter<AdapterDoListy.VH> {
 
@@ -28,9 +29,8 @@ public class AdapterDoListy extends RecyclerView.Adapter<AdapterDoListy.VH> {
         refreshAll();
     }
 
-    public void updateWith(List<Model> models) {
-        dataSet.clear();
-        refreshWith(models);
+    public void update() {
+        refreshAll();
     }
     private void refreshWith(List<Model> data){
         dataSet.addAll(data);
@@ -38,12 +38,24 @@ public class AdapterDoListy extends RecyclerView.Adapter<AdapterDoListy.VH> {
         notifyDataSetChanged();
     }
 
+    /**
+     * tworzenie widoku
+     * @param viewGroup
+     * @param i
+     * @return
+     */
     @Override
     public VH onCreateViewHolder(ViewGroup viewGroup, int i) {
         View v = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.item, viewGroup, false);
         return new VH(v);
     }
 
+
+    /**
+     * odświeżenie pojedynczego elementu listy
+     * @param vh
+     * @param position
+     */
     @Override
     public void onBindViewHolder(VH vh, int position) {
         final Model model = dataSet.get(position);
@@ -51,6 +63,9 @@ public class AdapterDoListy extends RecyclerView.Adapter<AdapterDoListy.VH> {
         final Bitmap kasztan = BitmapFactory.decodeFile(model.getBorrowerFilePath());
         vh.borrower.setImageBitmap(kasztan);
         vh.pencil.setImageBitmap(pencilImage);
+        /**
+         * po kliknięciu długo na item, usuwamy go
+         */
         vh.itemView.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
