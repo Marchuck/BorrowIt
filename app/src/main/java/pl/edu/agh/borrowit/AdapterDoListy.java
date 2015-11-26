@@ -8,6 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
@@ -54,6 +55,11 @@ public class AdapterDoListy extends RecyclerView.Adapter<AdapterDoListy.VH> {
     }
 
 
+    /**
+     * przeskalowanie obrazu do wymiaru 100x100 aby zmniejszyć rozmiar bitmapy
+     * @param path
+     * @return
+     */
     private Bitmap scaledBMP(String path) {
         return Bitmap.createScaledBitmap(BitmapFactory.decodeFile(path), 100, 100, false);
     }
@@ -70,10 +76,11 @@ public class AdapterDoListy extends RecyclerView.Adapter<AdapterDoListy.VH> {
         final Bitmap pencilImage = scaledBMP(model.getImageFilePath());
         final Bitmap kasztan = scaledBMP(model.getBorrowerFilePath());
 
+        vh.number.setText(model.getPhoneNumber());
         vh.borrower.setImageBitmap(kasztan);
         vh.pencil.setImageBitmap(pencilImage);
         /**
-         * po kliknięciu długo na item, usuwamy go
+         * po przyciśnięciu itema, usuwamy go:
          */
         vh.itemView.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
@@ -104,12 +111,14 @@ public class AdapterDoListy extends RecyclerView.Adapter<AdapterDoListy.VH> {
     }
 
     public static class VH extends RecyclerView.ViewHolder {
-        private ImageView pencil, borrower;
-
+        public ImageView pencil, borrower;
+        public TextView number;
         public VH(View itemView) {
             super(itemView);
             pencil = (ImageView) itemView.findViewById(R.id.pencil);
             borrower = (ImageView) itemView.findViewById(R.id.borrower);
+            number = (TextView) itemView.findViewById(R.id.phoneNumber);
+
         }
     }
 }

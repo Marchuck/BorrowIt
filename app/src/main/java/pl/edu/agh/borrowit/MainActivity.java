@@ -1,7 +1,5 @@
 package pl.edu.agh.borrowit;
 
-import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Color;
@@ -26,9 +24,14 @@ public class MainActivity extends AppCompatActivity {
     public static final int SELECT_KASZTAN_PHOTO = 100;
     public static final int SELECT_PENCIL_PHOTO = 200;
 
-    /**stan aktualny wybranego pliku*/
+    /**
+     * stan aktualny wybranego pliku
+     */
     private IMAGE_SELECTED CURRENT = IMAGE_SELECTED.NONE;
-    /**enum reprezentujący stany*/
+
+    /**
+     * enum reprezentujący stany
+     */
     private enum IMAGE_SELECTED {
         NONE, KASZTAN, PENCIL
     }
@@ -71,6 +74,7 @@ public class MainActivity extends AppCompatActivity {
 
     /**
      * stworzenie widoku Activity
+     *
      * @param savedInstanceState
      */
     @Override
@@ -111,6 +115,7 @@ public class MainActivity extends AppCompatActivity {
 
     /**
      * powrót do aktywności po wybraniu obrazu
+     *
      * @param requestCode
      * @param resultCode
      * @param imageReturnedIntent
@@ -173,42 +178,55 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void pokazOkno() {
-        AlertDialog.Builder okno = new AlertDialog.Builder(MainActivity.this);
-        okno.setMessage("Do you want to add this pair?");
-        okno.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+        new AddTextAction(this, new AddTextAction.TextSendListener() {
             @Override
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.dismiss();
-            }
-        });
-        okno.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                CURRENT = IMAGE_SELECTED.NONE;
-                saveToDB();
+            public void onSend(String phoneNumber) {
+                saveToDB(phoneNumber);
                 updateList();
-                dialog.dismiss();
+            }
+
+            @Override
+            public void onCancel() {
+                CURRENT = IMAGE_SELECTED.NONE;
             }
         });
-        okno.show();
+//        AlertDialog.Builder okno = new AlertDialog.Builder(MainActivity.this);
+//        okno.setMessage("Do you want to add this pair?");
+//        okno.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+//            @Override
+//            public void onClick(DialogInterface dialog, int which) {
+//                dialog.dismiss();
+//            }
+//        });
+//        okno.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+//            @Override
+//            public void onClick(DialogInterface dialog, int which) {
+//                CURRENT = IMAGE_SELECTED.NONE;
+//                saveToDB();
+//                updateList();
+//                dialog.dismiss();
+//            }
+//        });
+//        okno.show();
     }
 
     /**
      * zapis nowego rekordu do bazy danych
      */
-    private void saveToDB() {
+    private void saveToDB(String phoneNumber) {
         Log.d(TAG, "saveToDB ");
         realm.beginTransaction(); //rozpoczęcie transakcji
         Model newRecord = realm.createObject(Model.class);
         newRecord.setPrimaryKey(UUID.randomUUID().toString()); //primary key musi być unikalny
         newRecord.setBorrowerFilePath(temporaryKasztan);
         newRecord.setImageFilePath(temporaryPencil);
+        newRecord.setPhoneNumber(phoneNumber);
         realm.commitTransaction(); //zakończenie transakcji
     }
 
     private void updateList() {
         Log.d(TAG, "updateList ");
         adapterDoListy.update();
-        Toast.makeText(this,"List updated",Toast.LENGTH_LONG).show();
+        Toast.makeText(this, "List updated", Toast.LENGTH_LONG).show();
     }
 }

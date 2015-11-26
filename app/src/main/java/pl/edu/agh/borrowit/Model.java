@@ -17,6 +17,15 @@ public class Model extends RealmObject {
     private String primaryKey;
     private String borrowerFilePath;
     private String imageFilePath;
+    private String phoneNumber;
+
+    public String getPhoneNumber() {
+        return phoneNumber;
+    }
+
+    public void setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
+    }
 
     public Model() {
     }
