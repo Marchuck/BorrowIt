@@ -115,9 +115,12 @@ public class AdapterDoListy extends RecyclerView.Adapter<AdapterDoListy.VH> {
         public TextView number;
         public VH(View itemView) {
             super(itemView);
+            /**
+             * itemy znalezione w widoku R.layout.item (należy nadać im unikalne ID aby móc je tu przypisać)
+             */
             pencil = (ImageView) itemView.findViewById(R.id.pencil);
             borrower = (ImageView) itemView.findViewById(R.id.borrower);
-            number = (TextView) itemView.findViewById(R.id.phoneNumber);
+            number = (TextView) itemView.findViewById(R.id.number);
 
         }
     }
